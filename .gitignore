@@ -6,3 +6,4 @@
 # Folders
 .idea
 logs
+__pycache__
