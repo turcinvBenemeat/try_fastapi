@@ -1,0 +1,8 @@
+# Files
+.env
+*.xml
+*.iml
+
+# Folders
+.idea
+logs
