@@ -9,6 +9,5 @@ COPY requirements.txt .
 
 RUN --mount=type=cache,target=/root/.cache pip install -r requirements.txt
 
-COPY app app
 COPY src src
 COPY main.py .
