@@ -2,6 +2,7 @@
 .env
 *.xml
 *.iml
+sql_app.db
 
 # Folders
 .idea
