@@ -1,17 +1,12 @@
-from collections.abc import Generator
-
+from typing import Generator
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-import models
-from models import Task as TaskORM
-from schemas import Task as TaskSchema, TaskCreate
-from database import engine, SessionLocal
-from logger import logger
-
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+from src.models import Task as TaskORM
+from src.schemas import Task as TaskSchema, TaskCreate
+from src.database import SessionLocal
+from src.logger import logger
 
 logger.info("Task manager started")
 
@@ -40,7 +35,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 @app.get("/", tags=["root"])
-def read_root() -> str:
+def read_root() -> dict[str, str]:
     """
     Root endpoint used as a simple liveness check.
 
@@ -52,7 +47,7 @@ def read_root() -> str:
         route if you need that.
     """
     logger.info("Getting root")
-    return "Task Manager API is running"
+    return {"message": "Task Manager API is running"}
 
 
 @app.get("/tasks", response_model=list[TaskSchema], tags=["tasks"])
