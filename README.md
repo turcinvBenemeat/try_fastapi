@@ -1,6 +1,6 @@
 # try_fastapi
 
-Small **FastAPI** service with **SQLAlchemy 2**, **SQLite** by default, and **pytest** + **TestClient** tests.
+Small **FastAPI** app with **SQLAlchemy 2**, **SQLite** by default, **APIRouter**-based routes, and **pytest** + **TestClient**.
 
 ## Requirements
 
@@ -14,8 +14,8 @@ Copy `.env.example` to `.env` and adjust if needed:
 | Variable | Purpose |
 |----------|---------|
 | `DATABASE_URL` | App database (default: file SQLite) |
-| `TEST_DATABASE_URL` | Tests (e.g. `sqlite:///:memory:`) |
-| `PYTHONPATH` | Use `.` so imports like `src.main` resolve |
+| `TEST_DATABASE_URL` | Test DB (e.g. `sqlite:///:memory:`; compose passes this as `DATABASE_URL` in the test service) |
+| `PYTHONPATH` | Set to `.` so `src.main` and friends resolve |
 
 ## Run with Docker
 
@@ -24,9 +24,9 @@ docker compose up try-fastapi
 ```
 
 - API: [http://localhost:8000](http://localhost:8000)  
-- OpenAPI UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+- OpenAPI: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-Run the test container:
+Tests:
 
 ```bash
 docker compose run --rm try-fastapi-tests
@@ -50,8 +50,15 @@ pytest tests
 
 ## Layout
 
-- `src/main.py` — app, routes, DB dependency  
-- `src/database.py` — engine, session, `Base`  
-- `src/models.py` — SQLAlchemy models  
-- `src/schemas.py` — Pydantic request/response schemas  
-- `tests/` — pytest + `conftest.py` fixtures  
+| Path | Role |
+|------|------|
+| `src/main.py` | `FastAPI` app, `include_router`, root `GET /` |
+| `src/routers/tasks.py` | Task CRUD under `/tasks` |
+| `src/routers/projects.py` | Placeholder for more routers |
+| `src/database.py` | Engine, `SessionLocal`, `get_db`, `Base` |
+| `src/models/tasks.py` | SQLAlchemy `Task` model |
+| `src/schemas/tasks.py` | Pydantic `Task` / `TaskCreate` schemas |
+| `src/logger.py` | Logging helper |
+| `tests/conftest.py` | `client`, `db_session` fixtures |
+| `tests/test_main.py` | App / root route |
+| `tests/test_tasks.py` | `/tasks` API |
