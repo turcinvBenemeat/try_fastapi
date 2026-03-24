@@ -2,16 +2,18 @@
 
 def test_get_tasks(client, db_session) -> None:
     """Two ``POST /tasks``, then ``GET /tasks`` → list of length 2."""
-    client.post("/tasks", json={
+    r1 = client.post("/tasks", json={
         "title": "Task 1",
         "description": "Description 1",
         "completed": False,
     })
-    client.post("/tasks", json={
+    r2 = client.post("/tasks", json={
         "title": "Task 2",
         "description": "Description 2",
         "completed": True,
     })
+    assert r1.status_code == 200
+    assert r2.status_code == 200
 
     response = client.get("/tasks")
 
@@ -23,7 +25,7 @@ def test_get_tasks(client, db_session) -> None:
 
 
 def test_create_task(client, db_session) -> None:
-    """``POST /tasks`` → 200, ``id`` int, fields echo payload."""
+    """``POST /tasks`` → 200, ``id`` int, fields echo payload, timestamps set."""
     payload = {
         "title": "Testing Task",
         "description": "Task Description",
@@ -39,6 +41,9 @@ def test_create_task(client, db_session) -> None:
     assert data["title"] == "Testing Task"
     assert data["description"] == "Task Description"
     assert data["completed"] is False
+    assert data.get("project_id") is None
+    assert "created_at" in data
+    assert "updated_at" in data
 
 
 def test_get_task(client, db_session) -> None:
@@ -50,6 +55,7 @@ def test_get_task(client, db_session) -> None:
     }
 
     create_response = client.post("/tasks", json=payload)
+    assert create_response.status_code == 200
     task = create_response.json()
 
     response = client.get(f"/tasks/{task['id']}")
@@ -74,7 +80,7 @@ def test_update_task(client, db_session) -> None:
         "description": "Old description",
         "completed": False,
     })
-
+    assert create_response.status_code == 200
     task = create_response.json()
 
     update_payload = {
@@ -91,20 +97,22 @@ def test_update_task(client, db_session) -> None:
     assert data["title"] == "New"
     assert data["description"] == "New description"
     assert data["completed"] is True
+    assert data["id"] == task["id"]
 
 
 def test_delete_task(client, db_session) -> None:
-    """``DELETE /tasks/{id}`` (200 or 204); subsequent GET → 404."""
+    """``DELETE /tasks/{id}`` → 200; subsequent ``GET`` → 404."""
     create_response = client.post("/tasks", json={
         "title": "Delete me",
         "description": "Soon gone",
         "completed": False,
     })
-
+    assert create_response.status_code == 200
     task = create_response.json()
 
     response = client.delete(f"/tasks/{task['id']}")
-    assert response.status_code in (200, 204)
+    assert response.status_code == 200
+    assert response.json() == {"message": f"Task {task['id']} was deleted"}
 
     check = client.get(f"/tasks/{task['id']}")
     assert check.status_code == 404

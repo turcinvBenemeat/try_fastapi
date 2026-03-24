@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from src.main import app
 from src.database import Base, engine, SessionLocal
 
+
 @pytest.fixture(scope="function")
 def db_session() -> Generator[Session, None, None]:
     """
@@ -32,18 +33,12 @@ def db_session() -> Generator[Session, None, None]:
     finally:
         db.close()
 
+
 @pytest.fixture(scope="function")
-def client() -> Generator[TestClient, None, None]:
+def client(db_session: Session) -> Generator[TestClient, None, None]:
     """
-    Provide a Starlette/FastAPI ``TestClient`` for issuing HTTP calls to ``app``.
-
-    Uses the context-manager form so startup/shutdown events and the ASGI lifespan
-    (if any) are respected around the test.
-
-    Yields:
-        TestClient: Client with ``.get``, ``.post``, etc., against the same
-        ``app`` instance imported from ``src.main``.
+    HTTP client against ``app``. Depends on ``db_session`` so the schema is reset
+    before the client is used (stable order across pytest versions).
     """
     with TestClient(app) as test_client:
         yield test_client
-
