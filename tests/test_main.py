@@ -38,3 +38,12 @@ def test_create_task(client, db_session) -> None:
     assert data["description"] == "Task Description"
     assert data["completed"] is False
 
+
+def test_get_task_not_found(client, db_session) -> None:
+    """
+    ``GET /tasks/{id}`` returns 404 with FastAPI's default error body when the row is missing.
+    """
+    response = client.get("/tasks/100")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Task not found"}
+
