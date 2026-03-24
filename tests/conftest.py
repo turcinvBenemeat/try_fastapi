@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from src.main import app
 from src.database import engine, SessionLocal
-from src.models import Base
+from src.models.tasks import Base
 
 @pytest.fixture(scope="function")
 def db_session() -> Generator[Session, None, None]:
