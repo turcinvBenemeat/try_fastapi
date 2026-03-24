@@ -1,5 +1,4 @@
 from typing import Any
-
 from fastapi import APIRouter, Body
 
 router = APIRouter(prefix="/projects", tags=["projects"])
