@@ -2,8 +2,7 @@ from fastapi import FastAPI
 
 from src.database import Base, engine
 from src.logger import logger
-from src.models.tasks import Task  # noqa: F401
-from src.routers import tasks_router
+from src.routers import tasks_router, projects_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -12,6 +11,7 @@ logger.info("Task manager started")
 app = FastAPI(title="Task Manager API")
 
 app.include_router(tasks_router)
+app.include_router(projects_router)
 
 
 @app.get("/", tags=["root"])
