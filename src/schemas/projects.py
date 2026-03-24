@@ -12,12 +12,12 @@ class ProjectBase(BaseModel):
 
 
 # This is used for creating a new task
-class TaskCreate(ProjectBase):
+class ProjectCreate(ProjectBase):
     pass
 
 
 # Data sent BACK to the user (includes the database ID)
-class Task(ProjectBase):
+class Project(ProjectBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
