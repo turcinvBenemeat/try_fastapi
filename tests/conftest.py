@@ -5,8 +5,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from src.main import app
-from src.database import engine, SessionLocal
-from src.models.tasks import Base
+from src.database import Base, engine, SessionLocal
 
 @pytest.fixture(scope="function")
 def db_session() -> Generator[Session, None, None]:

@@ -1,8 +1,12 @@
 import os
+from typing import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.pool import StaticPool
+from sqlalchemy.orm import Session
+
+from src.logger import logger
 
 # Prefer explicit DATABASE_URL; in tests Compose may only set TEST_DATABASE_URL.
 DATABASE_URL = (
@@ -26,3 +30,23 @@ engine = create_engine(DATABASE_URL, connect_args=connect_args, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+def get_db() -> Generator[Session, None, None]:
+    """
+    FastAPI dependency that provides a SQLAlchemy session for one request.
+
+    Opens a session before the route runs and closes it afterward, so
+    connections are not leaked.
+
+    Yields:
+        Session: Database session bound to this request.
+
+    Example:
+        Injected via ``Depends(get_db)`` on route parameters.
+    """
+    logger.info("Getting db")
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
