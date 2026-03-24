@@ -1,12 +1,16 @@
-from sqlalchemy import Boolean, Column, Integer, String
+from datetime import datetime
+
+from sqlalchemy import Boolean, Column, Integer, String, DateTime
 
 from src.database import Base
 
 # TODO: Change structure
 
 class Project(Base):
-    __tablename__ = "tasks"
+    __tablename__ = "projects"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
+    name = Column(String)
     description = Column(String)
-    completed = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    is_active = Column(Boolean, default=True)
