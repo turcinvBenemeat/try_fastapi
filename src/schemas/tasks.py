@@ -1,21 +1,29 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-# Data needed to CREATE a task (sent by user)
+
 class TaskBase(BaseModel):
+    """Shared fields for create/update payloads (matches writable ORM columns)."""
+
     title: str
     description: Optional[str] = None
     completed: bool = False
+    project_id: Optional[int] = None
 
 
-# This is used for creating a new task
 class TaskCreate(TaskBase):
+    """Body for ``POST /tasks`` (no ``id`` or timestamps; server sets those)."""
+
     pass
 
 
-# Data sent BACK to the user (includes the database ID)
 class Task(TaskBase):
+    """API representation of a row; aligns with ``src.models.tasks.Task``."""
+
     id: int
+    created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

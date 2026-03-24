@@ -2,7 +2,9 @@ from fastapi import FastAPI
 
 from src.database import Base, engine
 from src.logger import logger
-from src.routers import tasks_router, projects_router
+from src.models import projects as _projects  # noqa: F401
+from src.models import tasks as _tasks  # noqa: F401 — register models on Base.metadata
+from src.routers import projects_router, tasks_router
 
 Base.metadata.create_all(bind=engine)
 

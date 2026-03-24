@@ -1,23 +1,29 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-# TODO: Update structure
 
-# Data needed to CREATE a task (sent by user)
 class ProjectBase(BaseModel):
-    title: str
+    """Shared fields for create/update (writable ORM columns only)."""
+
+    name: str
     description: Optional[str] = None
-    completed: bool = False
+    # ORM default is True; keep the same so “omit field” semantics match the DB.
+    is_active: bool = True
 
 
-# This is used for creating a new task
 class ProjectCreate(ProjectBase):
+    """Body for ``POST /projects`` (when implemented with persistence)."""
+
     pass
 
 
-# Data sent BACK to the user (includes the database ID)
 class Project(ProjectBase):
+    """API representation of a row; aligns with ``src.models.projects.Project``."""
+
     id: int
+    created_at: datetime
+    updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

@@ -36,6 +36,7 @@ def create_task(task_data: TaskCreate, db: Session = Depends(get_db)) -> TaskORM
         title=task_data.title,
         description=task_data.description,
         completed=task_data.completed,
+        project_id=task_data.project_id,
     )
     db.add(new_task)
     db.commit()
@@ -59,6 +60,7 @@ def update_task(
     task.title = task_data.title
     task.description = task_data.description
     task.completed = task_data.completed
+    task.project_id = task_data.project_id
     db.commit()
     db.refresh(task)
     logger.info(f"Task with ID {task_id} updated")
