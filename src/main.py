@@ -121,32 +121,6 @@ def create_task(task_data: TaskCreate, db: Session = Depends(get_db)) -> TaskORM
     return new_task
 
 
-@app.delete("/tasks/{task_id}", tags=["tasks"])
-def delete_task(task_id: int, db: Session = Depends(get_db)) -> dict[str, str]:
-    """
-    Remove a task by primary key.
-
-    Args:
-        task_id: Numeric primary key of the task to delete.
-        db: Active SQLAlchemy session (injected).
-
-    Returns:
-        dict: JSON body ``{"message": "Task <id> was deleted"}`` on success;
-        HTTP status **200** with ``Content-Type: application/json``.
-
-    Raises:
-        HTTPException: 404 if no task exists for ``task_id``.
-    """
-    logger.info(f"Deleting task with ID {task_id}")
-    task = db.scalars(select(TaskORM).where(TaskORM.id == task_id)).first()
-    if not task:
-        logger.error(f"Task with ID {task_id} not found")
-        raise HTTPException(status_code=404, detail="Task not found")
-    db.delete(task)
-    db.commit()
-    logger.info(f"Deleted task with ID {task_id}")
-    return {"message": f"Task {task_id} was deleted"}
-
 
 @app.put("/tasks/{task_id}", response_model=TaskSchema, tags=["tasks"])
 def update_task(task_id: int, task_data: TaskCreate, db: Session = Depends(get_db)) -> TaskORM:
@@ -177,3 +151,30 @@ def update_task(task_id: int, task_data: TaskCreate, db: Session = Depends(get_d
     db.refresh(task)
     logger.info(f"Updated task with ID {task_id}")
     return task
+
+
+@app.delete("/tasks/{task_id}", tags=["tasks"])
+def delete_task(task_id: int, db: Session = Depends(get_db)) -> dict[str, str]:
+    """
+    Remove a task by primary key.
+
+    Args:
+        task_id: Numeric primary key of the task to delete.
+        db: Active SQLAlchemy session (injected).
+
+    Returns:
+        dict: JSON body ``{"message": "Task <id> was deleted"}`` on success;
+        HTTP status **200** with ``Content-Type: application/json``.
+
+    Raises:
+        HTTPException: 404 if no task exists for ``task_id``.
+    """
+    logger.info(f"Deleting task with ID {task_id}")
+    task = db.scalars(select(TaskORM).where(TaskORM.id == task_id)).first()
+    if not task:
+        logger.error(f"Task with ID {task_id} not found")
+        raise HTTPException(status_code=404, detail="Task not found")
+    db.delete(task)
+    db.commit()
+    logger.info(f"Deleted task with ID {task_id}")
+    return {"message": f"Task {task_id} was deleted"}
