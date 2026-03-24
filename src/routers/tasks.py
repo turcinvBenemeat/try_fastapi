@@ -61,7 +61,7 @@ def update_task(
     task.completed = task_data.completed
     db.commit()
     db.refresh(task)
-    logger.info(f"Updated task with ID {task_id}")
+    logger.info(f"Task with ID {task_id} updated")
     return task
 
 
@@ -75,5 +75,5 @@ def delete_task(task_id: int, db: Session = Depends(get_db)) -> dict[str, str]:
         raise HTTPException(status_code=404, detail="Task not found")
     db.delete(task)
     db.commit()
-    logger.info(f"Deleted task with ID {task_id}")
+    logger.info(f"Task with ID {task_id} deleted")
     return {"message": f"Task {task_id} was deleted"}

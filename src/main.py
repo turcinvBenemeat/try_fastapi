@@ -10,9 +10,6 @@ logger.info("Task manager started")
 
 app = FastAPI(title="Task Manager API")
 
-app.include_router(tasks_router)
-app.include_router(projects_router)
-
 
 @app.get("/", tags=["root"])
 def read_root() -> dict[str, str]:
@@ -28,3 +25,6 @@ def read_root() -> dict[str, str]:
     """
     logger.info("Getting root")
     return {"message": "Task Manager API is running"}
+
+app.include_router(tasks_router)
+app.include_router(projects_router)
