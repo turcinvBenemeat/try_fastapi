@@ -1,34 +1,31 @@
-# version: '3'
+# Production: docker compose up -d
+# Build: docker compose build
+
 services:
   try-fastapi:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
+      target: production
     ports:
       - "8000:8000"
-    command: "uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
     env_file: ".env"
-    restart: "always"
+    restart: unless-stopped
+    # Code and deps come from the image; no bind mounts.
     volumes:
-      - ./logs:/app/logs
-      - ./src:/app/src
+      - try_fastapi_logs:/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5)",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-  try-fastapi-tests:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
-    command: "pytest tests"
-    env_file: ".env"
-    restart: "no"
-    environment:
-      - DATABASE_URL=${TEST_DATABASE_URL}
-    volumes:
-      - ./src:/app/src
-      - ./tests:/app/tests
+
+volumes:
+  try_fastapi_logs:
